@@ -10,7 +10,6 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
         res.status(405).end();
         return;
     }
-    console.log('req', req);
     if (req.body.password === 'a') {
         const token = buildAuthToken(req.body.email);
         setCookies(AUTH_COOKIE_NAME, token, {
@@ -19,11 +18,11 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
             httpOnly: true,
             domain: process.env.ORIGIN,
         });
-        res.redirect(req.body.redirectUri).end();
+        res.redirect(303, req.body.redirectUri).end();
     } else {
         let usp = new URLSearchParams();
         usp.append('redirect_uri', req.body.redirectUri);
         usp.append('error', 'invalid_credentials');
-        res.redirect(`/login?${usp.toString()}`).end();
+        res.redirect(303, `/login?${usp.toString()}`).end();
     }
 }
