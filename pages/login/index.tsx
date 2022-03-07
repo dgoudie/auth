@@ -19,8 +19,8 @@ const Login: NextPage<Props> = ({ redirectUri, origin, imageNumber }) => {
             <Head>
                 <title>Login | {origin}</title>
             </Head>
-            <Box bg='canvas.default'>
-                <Text fontFamily='fonts.normal'>Sign in to {origin}</Text>
+            <Box>
+                <Text>Sign in to {origin}</Text>
             </Box>
         </React.Fragment>
     );
