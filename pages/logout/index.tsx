@@ -18,7 +18,6 @@ export default Logout;
 
 export const getServerSideProps = handle<Props>({
     async get({ req, res }) {
-        console.log('here');
         removeCookies(AUTH_COOKIE_NAME, { req, res });
         return redirect(`/login?logout_action=1`);
     },

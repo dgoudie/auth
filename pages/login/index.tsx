@@ -35,7 +35,6 @@ const Login: NextPage<Props> = ({
     invalidCredentials,
     isLogoutAction,
 }) => {
-    console.log(isLogoutAction);
     const [submitted, setSubmitted] = useState(false);
 
     const [showInvalidCredsMessage, setShowInvalidCredsMessage] =
