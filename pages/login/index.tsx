@@ -1,30 +1,36 @@
 import type { GetServerSideProps, NextPage } from 'next';
+import React, { useMemo } from 'react';
 
 import Head from 'next/head';
 import Image from 'next/image';
 import { ServerResponse } from 'http';
 import styles from './login.module.scss';
-import { useMemo } from 'react';
 
 interface Props {
     redirectUri: string;
+    origin: string;
 }
 
-const Login: NextPage<Props> = ({ redirectUri }) => {
+const Login: NextPage<Props> = ({ redirectUri, origin }) => {
     const imageNumber = useMemo(
         () => Math.floor(Math.random() * (50 - 1 + 1) + 1),
         []
     );
     return (
-        <div className={styles.root}>
-            <div className={styles.backgroundImage}>
-                <Image
-                    src={`https://cdn.goudie.dev/images/bg/${imageNumber}.jpg`}
-                    alt='Background'
-                    layout='fill'
-                />
+        <React.Fragment>
+            <Head>
+                <title>Login | {origin}</title>
+            </Head>
+            <div className={styles.root}>
+                <div className={styles.backgroundImage}>
+                    <Image
+                        src={`https://cdn.goudie.dev/images/bg/${imageNumber}.jpg`}
+                        alt='Background'
+                        layout='fill'
+                    />
+                </div>
             </div>
-        </div>
+        </React.Fragment>
     );
 };
 
@@ -44,7 +50,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({
         if (!redirectUriHost.endsWith(process.env.ORIGIN!)) {
             return redirectWithDefaultRedirectUri(res);
         }
-        return { props: { redirectUri } };
+        return { props: { redirectUri, origin: process.env.ORIGIN! } };
     } catch (e) {
         return redirectWithDefaultRedirectUri(res);
     }
@@ -56,5 +62,5 @@ const redirectWithDefaultRedirectUri = (res: ServerResponse) => {
             process.env.DEFAULT_REDIRECT_URL!
         )}`,
     }).end();
-    return { props: { redirectUri: 'N/A' } };
+    return { props: { redirectUri: 'N/A', origin: process.env.ORIGIN! } };
 };
