@@ -1,22 +1,33 @@
-import type { GetServerSideProps, NextPage } from 'next';
+import type {
+    GetServerSideProps,
+    GetServerSidePropsResult,
+    NextPage,
+} from 'next';
+import { IncomingMessage, ServerResponse } from 'http';
 import React, { SyntheticEvent, useCallback } from 'react';
+import { handle, json, redirect } from 'next-runtime';
 
+import { AUTH_COOKIE_NAME } from '../../constants';
 import Head from 'next/head';
-import Image from 'next/image';
-import { ServerResponse } from 'http';
+import User from '../../mongoose/User';
+import { addMonths } from 'date-fns';
+import { buildAuthToken } from '../../utils/jsonwebtoken';
+import dbConnect from '../../mongoose/init';
+import { performSHA256Hash } from '../../utils/sha256';
+import { setCookies } from 'cookies-next';
 import styles from './login.module.scss';
 
 interface Props {
     redirectUri: string;
     origin: string;
-    imageNumber: number;
+    invalidCredentials: boolean;
 }
 
-const Login: NextPage<Props> = ({ redirectUri, origin, imageNumber }) => {
-    const onFormSubmitError = useCallback((error: SyntheticEvent) => {
-        console.log('error', error);
-    }, []);
-
+const Login: NextPage<Props> = ({
+    redirectUri,
+    origin,
+    invalidCredentials,
+}) => {
     return (
         <React.Fragment>
             <Head>
@@ -26,17 +37,7 @@ const Login: NextPage<Props> = ({ redirectUri, origin, imageNumber }) => {
                 <div className={styles.formWrapperHeader}>
                     Sign in to {origin}
                 </div>
-                <form
-                    className={styles.form}
-                    method='POST'
-                    action='/api/authenticate'
-                    onError={onFormSubmitError}
-                >
-                    <input
-                        name='redirectUri'
-                        type='hidden'
-                        value={redirectUri}
-                    />
+                <form className={styles.form} method='POST'>
                     <label htmlFor='email-address'>Email address</label>
                     <input
                         name='email'
@@ -61,39 +62,75 @@ const Login: NextPage<Props> = ({ redirectUri, origin, imageNumber }) => {
 
 export default Login;
 
-export const getServerSideProps: GetServerSideProps<Props> = async ({
-    res,
-    query,
-}) => {
-    const imageNumber = Math.floor(Math.random() * (24 - 1 + 1) + 1);
-    let redirectUri = query?.['redirect_uri'];
-    if (typeof redirectUri !== 'string') {
-        return redirectWithDefaultRedirectUri(res, imageNumber);
-    }
-    redirectUri = decodeURIComponent(redirectUri).toLowerCase();
-    try {
-        const redirectUriHost = new URL(redirectUri).host;
-        if (!redirectUriHost.endsWith(process.env.ORIGIN!)) {
-            return redirectWithDefaultRedirectUri(res, imageNumber);
+export const getServerSideProps = handle<Props>({
+    async get({ query }) {
+        const redirectUri = query!['redirect_uri'] as string;
+        return json({
+            redirectUri,
+            origin: process.env.ORIGIN!,
+            invalidCredentials: false,
+        });
+    },
+
+    async post({ req, res, query }) {
+        const redirectUri = query!['redirect_uri'] as string;
+        const { email, password } = req.body;
+        if (!requestIsValid(email, password)) {
+            return json({
+                redirectUri,
+                origin: process.env.ORIGIN!,
+                invalidCredentials: false,
+            });
         }
-        return {
-            props: { redirectUri, origin: process.env.ORIGIN!, imageNumber },
-        };
-    } catch (e) {
-        return redirectWithDefaultRedirectUri(res, imageNumber);
-    }
+        const user = await lookupUser(email as string, password as string);
+        if (!!user) {
+            const expires = addMonths(new Date(), 1);
+            const token = buildAuthToken(user, expires);
+            setCookies(AUTH_COOKIE_NAME, token, {
+                expires,
+                req,
+                res,
+                httpOnly: true,
+                domain:
+                    process.env.NODE_ENV === 'development'
+                        ? undefined
+                        : process.env.ORIGIN,
+                secure: true,
+            });
+            return redirect(redirectUri);
+        } else {
+            return json({
+                redirectUri,
+                origin: process.env.ORIGIN!,
+                invalidCredentials: true,
+            });
+        }
+    },
+});
+
+const lookupUser = async (emailAddress: string, password: string) => {
+    const passwordHashSHA256 = performSHA256Hash(password);
+    await dbConnect();
+    return await User.findOne({
+        emailAddress,
+        passwordHashSHA256,
+    })
+        .select('-passwordHashSHA256')
+        .exec();
 };
 
-const redirectWithDefaultRedirectUri = (
-    res: ServerResponse,
-    imageNumber: number
-) => {
-    res.writeHead(302, {
-        location: `/login?redirect_uri=${encodeURIComponent(
-            process.env.DEFAULT_REDIRECT_URL!
-        )}`,
-    }).end();
-    return {
-        props: { redirectUri: 'N/A', origin: process.env.ORIGIN!, imageNumber },
-    };
+const requestIsValid = (email: any, password: any) => {
+    if (typeof email !== 'string') {
+        return false;
+    }
+    if (typeof password !== 'string') {
+        return false;
+    }
+    if (!email.length) {
+        return false;
+    }
+    if (!password.length) {
+        return false;
+    }
+    return true;
 };

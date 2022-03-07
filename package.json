@@ -9,10 +9,14 @@
         "lint": "next lint"
     },
     "dependencies": {
+        "@tsndr/cloudflare-worker-jwt": "^1.1.6",
+        "bulma": "^0.9.3",
         "cookies-next": "^2.0.4",
         "date-fns": "^2.28.0",
         "jsonwebtoken": "^8.5.1",
+        "mongoose": "^6.2.4",
         "next": "12.1.0",
+        "next-runtime": "^2.3.4",
         "react": "17.0.2",
         "react-dom": "17.0.2",
         "sass": "^1.49.9",
