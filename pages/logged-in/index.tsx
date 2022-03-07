@@ -1,11 +1,8 @@
 import type { GetServerSideProps, NextPage } from 'next';
 import { handle, json, redirect } from 'next-runtime';
 
-import { AUTH_COOKIE_NAME } from '../../constants';
 import Head from 'next/head';
-import Image from 'next/image';
 import React from 'react';
-import styles from './logged-in.module.scss';
 
 interface Props {
     origin: string;
@@ -17,7 +14,19 @@ const LoggedIn: NextPage<Props> = ({ origin }) => {
             <Head>
                 <title>Login Successful | {origin}</title>
             </Head>
-            <div className={styles.header}>You&apos;re logged in!</div>
+            <div className={'container is-fluid'}>
+                <div className='block'></div>
+                <div className='block'>
+                    <div className='is-size-3 is-size-4-mobile has-text-centered'>
+                        You&apos;re logged in!
+                    </div>
+                </div>
+                <div className='block is-flex is-justify-content-center'>
+                    <a className='button is-info' href='/logout'>
+                        Logout
+                    </a>
+                </div>
+            </div>
         </React.Fragment>
     );
 };

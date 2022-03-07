@@ -2,11 +2,7 @@ import { Head, Html, Main, NextScript } from 'next/document';
 
 export default function Document() {
     return (
-        <Html
-            data-color-mode='auto'
-            data-light-theme='light'
-            data-dark-theme='dark'
-        >
+        <Html>
             <Head>
                 <link
                     rel='icon'

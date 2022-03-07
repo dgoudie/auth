@@ -1,27 +1,15 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500&display=swap');
-html,
-body {
-    padding: 0;
-    margin: 0;
-    font-family: 'Roboto', sans-serif;
-    --background-color: #ebebeb;
-    --background-color-light: #ffffff;
-    --background-border-color: #c2c3c5;
+@import 'bulma/sass/utilities/initial-variables';
 
-    @media (prefers-color-scheme: dark) {
-        --background-color: #0d1117;
-        --background-color-light: #1d2129;
-        --background-border-color: #30333b;
-    }
+$lime: #78f700;
+$primary: $lime;
+// $background: $black-ter;
+// $text: $white-ter;
+@import 'bulma/bulma';
 
-    background-color: var(--background-color);
-}
+// html {
+//     background-color: $background;
+// }
 
-a {
-    color: inherit;
-    text-decoration: none;
-}
-
-* {
-    box-sizing: border-box;
-}
+// .label {
+//     color: $white-ter;
+// }

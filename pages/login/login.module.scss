@@ -1,28 +1,15 @@
-.formWrapper {
-    max-width: 540px;
+.container {
+    max-width: 540px !important;
     padding: 0 1rem;
-    margin: 3rem auto 0;
-    &Header {
-        text-align: center;
-        font-size: 1.5rem;
-        font-weight: lighter;
-    }
 }
-.form {
-    background-color: var(--background-color-light);
-    padding: 1rem;
+
+.message {
     margin-top: 1rem;
-    border-radius: 8px;
-    border: 1px solid var(--background-border-color);
+}
+
+.buttonBar {
     display: grid;
-    gap: 0.5rem;
-
-    input,
-    button {
-        font-size: 16px;
-    }
-
-    button {
-        margin-top: 0.5rem;
-    }
+    grid-template-columns: min-content min-content;
+    gap: 0.7rem;
+    justify-content: flex-end;
 }
