@@ -2,6 +2,7 @@ import type { GetServerSideProps, NextPage } from 'next';
 import { handle, json, redirect } from 'next-runtime';
 
 import Head from 'next/head';
+import Link from 'next/link';
 import React from 'react';
 
 interface Props {
@@ -22,9 +23,9 @@ const LoggedIn: NextPage<Props> = ({ origin }) => {
                     </div>
                 </div>
                 <div className='block is-flex is-justify-content-center'>
-                    <a className='button is-info' href='/logout'>
-                        Logout
-                    </a>
+                    <Link href='/logout'>
+                        <a className='button is-info'>Logout</a>
+                    </Link>
                 </div>
             </div>
         </React.Fragment>
