@@ -1,6 +1,5 @@
-import { Box, FormControl, Text, TextInput, useTheme } from '@primer/react';
 import type { GetServerSideProps, NextPage } from 'next';
-import React, { useMemo } from 'react';
+import React, { SyntheticEvent, useCallback } from 'react';
 
 import Head from 'next/head';
 import Image from 'next/image';
@@ -14,42 +13,48 @@ interface Props {
 }
 
 const Login: NextPage<Props> = ({ redirectUri, origin, imageNumber }) => {
-    const { theme } = useTheme();
+    const onFormSubmitError = useCallback((error: SyntheticEvent) => {
+        console.log('error', error);
+    }, []);
+
     return (
         <React.Fragment>
             <Head>
                 <title>Login | {origin}</title>
             </Head>
-            <Box maxWidth={540} mx='auto' mt='3rem'>
-                <Text
-                    as='div'
-                    textAlign='center'
-                    fontSize={3}
-                    fontWeight='light'
-                >
+            <div className={styles.formWrapper}>
+                <div className={styles.formWrapperHeader}>
                     Sign in to {origin}
-                </Text>
-                <Box
-                    as='form'
-                    bg='canvas.subtle'
-                    p={'1rem'}
-                    mt='1rem'
-                    display='grid'
-                    gridGap={3}
-                    borderRadius={8}
-                    border='1px solid'
-                    borderColor={theme!.colors.border.muted}
+                </div>
+                <form
+                    className={styles.form}
+                    method='POST'
+                    action='/api/authenticate'
+                    onError={onFormSubmitError}
                 >
-                    <FormControl>
-                        <FormControl.Label>Email address</FormControl.Label>
-                        <TextInput type='email' autoFocus />
-                    </FormControl>
-                    <FormControl>
-                        <FormControl.Label>Password</FormControl.Label>
-                        <TextInput type='password' />
-                    </FormControl>
-                </Box>
-            </Box>
+                    <input
+                        name='redirectUri'
+                        type='hidden'
+                        value={redirectUri}
+                    />
+                    <label htmlFor='email-address'>Email address</label>
+                    <input
+                        name='email'
+                        type='email'
+                        id='email-address'
+                        required
+                        autoFocus
+                    />
+                    <label htmlFor='password'>Password</label>
+                    <input
+                        name='password'
+                        type='password'
+                        id='password'
+                        required
+                    />
+                    <button type='submit'>Login</button>
+                </form>
+            </div>
         </React.Fragment>
     );
 };
