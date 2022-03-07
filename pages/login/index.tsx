@@ -1,4 +1,4 @@
-import { Box, Text } from '@primer/react';
+import { Box, FormControl, Text, TextInput, useTheme } from '@primer/react';
 import type { GetServerSideProps, NextPage } from 'next';
 import React, { useMemo } from 'react';
 
@@ -14,13 +14,41 @@ interface Props {
 }
 
 const Login: NextPage<Props> = ({ redirectUri, origin, imageNumber }) => {
+    const { theme } = useTheme();
     return (
         <React.Fragment>
             <Head>
                 <title>Login | {origin}</title>
             </Head>
-            <Box>
-                <Text>Sign in to {origin}</Text>
+            <Box maxWidth={540} mx='auto' mt='3rem'>
+                <Text
+                    as='div'
+                    textAlign='center'
+                    fontSize={3}
+                    fontWeight='light'
+                >
+                    Sign in to {origin}
+                </Text>
+                <Box
+                    as='form'
+                    bg='canvas.subtle'
+                    p={'1rem'}
+                    mt='1rem'
+                    display='grid'
+                    gridGap={3}
+                    borderRadius={8}
+                    border='1px solid'
+                    borderColor={theme!.colors.border.muted}
+                >
+                    <FormControl>
+                        <FormControl.Label>Email address</FormControl.Label>
+                        <TextInput type='email' autoFocus />
+                    </FormControl>
+                    <FormControl>
+                        <FormControl.Label>Password</FormControl.Label>
+                        <TextInput type='password' />
+                    </FormControl>
+                </Box>
             </Box>
         </React.Fragment>
     );

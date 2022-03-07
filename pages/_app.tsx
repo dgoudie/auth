@@ -1,6 +1,6 @@
 import '../styles/globals.scss';
 
-import { ThemeProvider, theme } from '@primer/react';
+import { SSRProvider, ThemeProvider, theme } from '@primer/react';
 
 import type { AppProps } from 'next/app';
 import deepmerge from 'deepmerge';
@@ -12,9 +12,15 @@ function MyApp({ Component, pageProps }: AppProps) {
         },
     });
     return (
-        <ThemeProvider colorMode='auto' theme={customTheme} preventSSRMismatch>
-            <Component {...pageProps} />
-        </ThemeProvider>
+        <SSRProvider>
+            <ThemeProvider
+                colorMode='auto'
+                theme={customTheme}
+                preventSSRMismatch
+            >
+                <Component {...pageProps} />
+            </ThemeProvider>
+        </SSRProvider>
     );
 }
 
