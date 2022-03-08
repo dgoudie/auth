@@ -19,7 +19,7 @@ export const middleware: NextMiddleware = (req, ev) => {
     redirectUri = decodeURIComponent(redirectUri).toLowerCase();
     try {
         const redirectUriHost = new URL(redirectUri).host;
-        if (!redirectUriHost.endsWith(process.env.ORIGIN!)) {
+        if (!redirectUriHost.endsWith(process.env.TOP_LEVEL_DOMAIN!)) {
             return redirectWithDefaultUri(origin, searchParams);
         }
     } catch (e) {
@@ -34,7 +34,7 @@ const redirectWithDefaultUri = (
 ) => {
     searchParams.set(
         'redirect_uri',
-        encodeURIComponent(process.env.DEFAULT_REDIRECT_URL!)
+        encodeURIComponent(`${process.env.ORIGIN!}/logged-in`)
     );
     return NextResponse.redirect(`${origin}/login?${searchParams.toString()}`);
 };

@@ -37,7 +37,7 @@ export default LoggedIn;
 export const getServerSideProps = handle<Props>({
     async get({}) {
         return json({
-            origin: process.env.ORIGIN!,
+            origin: process.env.TOP_LEVEL_DOMAIN!,
         });
     },
 });

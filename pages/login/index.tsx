@@ -151,7 +151,7 @@ export default Login;
 export const getServerSideProps = handle<Props>({
     async get({ query }) {
         return json({
-            origin: process.env.ORIGIN!,
+            origin: process.env.TOP_LEVEL_DOMAIN!,
             invalidCredentials: false,
             isLogoutAction: !!query!['logout_action'],
         });
@@ -161,7 +161,7 @@ export const getServerSideProps = handle<Props>({
         const { email, password } = req.body;
         if (!requestIsValid(email, password)) {
             return json({
-                origin: process.env.ORIGIN!,
+                origin: process.env.TOP_LEVEL_DOMAIN!,
                 invalidCredentials: false,
                 isLogoutAction: !!query!['logout_action'],
             });
@@ -169,16 +169,13 @@ export const getServerSideProps = handle<Props>({
         const user = await lookupUser(email as string, password as string);
         if (!!user) {
             const expires = addMonths(new Date(), 1);
-            const token = buildAuthToken(user, expires);
+            const token = buildAuthToken(user._id, user.emailAddress, expires);
             setCookies(AUTH_COOKIE_NAME, token, {
                 expires,
                 req,
                 res,
                 httpOnly: true,
-                domain:
-                    process.env.NODE_ENV === 'development'
-                        ? undefined
-                        : process.env.ORIGIN,
+                domain: process.env.TOP_LEVEL_DOMAIN,
                 path: '/',
                 secure: true,
             });
@@ -188,7 +185,7 @@ export const getServerSideProps = handle<Props>({
             return redirect(redirectUri);
         } else {
             return json({
-                origin: process.env.ORIGIN!,
+                origin: process.env.TOP_LEVEL_DOMAIN!,
                 invalidCredentials: true,
                 isLogoutAction: !!query!['logout_action'],
             });

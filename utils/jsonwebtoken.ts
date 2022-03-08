@@ -1,5 +1,7 @@
 import { UserModel } from '../mongoose/User';
 import jwt from 'jsonwebtoken';
+import jwtDates from './jwt-dates';
+import { subMinutes } from 'date-fns';
 
 export interface JWTPayload {
     iat: number;
@@ -11,15 +13,30 @@ export interface JWTPayload {
     nbf: number;
 }
 
-export const buildAuthToken = (user: UserModel, expirationDate: Date) => {
+export const buildAuthToken = (
+    sub: string,
+    email: string,
+    expirationDate: Date
+) => {
     const payload: JWTPayload = {
-        iat: Date.now(),
-        exp: expirationDate.getTime(),
-        sub: user._id,
-        email: user.emailAddress,
-        iss: process.env.ORIGIN!,
-        aud: process.env.ORIGIN!,
-        nbf: Date.now(),
+        iat: jwtDates.now(),
+        exp: jwtDates.dateToJWTTimestamp(expirationDate),
+        sub,
+        email,
+        iss: process.env.TOP_LEVEL_DOMAIN!,
+        aud: process.env.TOP_LEVEL_DOMAIN!,
+        nbf: jwtDates.now(),
     };
     return jwt.sign(payload, process.env.JWT_TOKEN!);
+};
+
+export const isValidAuthToken = (token: string | undefined) => {
+    if (!token) {
+        return false;
+    }
+    return jwt.verify(token, process.env.JWT_TOKEN!);
+};
+
+export const decodeAuthToken = (token: string): JWTPayload => {
+    return jwt.decode(token) as JWTPayload;
 };
