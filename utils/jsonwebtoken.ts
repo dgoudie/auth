@@ -34,7 +34,11 @@ export const isValidAuthToken = (token: string | undefined) => {
     if (!token) {
         return false;
     }
-    return jwt.verify(token, process.env.JWT_TOKEN!);
+    try {
+        jwt.verify(token, process.env.JWT_TOKEN!);
+        return true;
+    } catch (e) {}
+    return false;
 };
 
 export const decodeAuthToken = (token: string): JWTPayload => {
