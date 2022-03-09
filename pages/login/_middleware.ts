@@ -4,11 +4,6 @@ import { AUTH_COOKIE_NAME } from '../../constants';
 import { isValidAuthToken } from '../../utils/cloudflare-worker-jwt';
 
 export const middleware: NextMiddleware = (req, ev) => {
-    const token = req.cookies[AUTH_COOKIE_NAME];
-    const isValid = isValidAuthToken(token);
-    if (isValid) {
-        return NextResponse.redirect(`${req.nextUrl.origin}/logged-in`);
-    }
     const {
         nextUrl: { searchParams, origin },
     } = req;
@@ -24,6 +19,11 @@ export const middleware: NextMiddleware = (req, ev) => {
         }
     } catch (e) {
         return redirectWithDefaultUri(origin, searchParams);
+    }
+    const token = req.cookies[AUTH_COOKIE_NAME];
+    const isValid = isValidAuthToken(token);
+    if (isValid) {
+        return NextResponse.redirect(redirectUri, 303);
     }
     return NextResponse.next();
 };
