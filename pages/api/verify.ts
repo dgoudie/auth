@@ -15,22 +15,6 @@ export default async function handler(
 ) {
     const token = req.cookies[AUTH_COOKIE_NAME];
     if (isValidAuthToken(token)) {
-        const jwtPayload = decodeAuthToken(token);
-        const expires = addMonths(new Date(), 1);
-        const newToken = buildAuthToken(
-            jwtPayload.sub,
-            jwtPayload.email,
-            expires
-        );
-        setCookies(AUTH_COOKIE_NAME, newToken, {
-            expires,
-            req,
-            res,
-            httpOnly: true,
-            domain: process.env.TOP_LEVEL_DOMAIN,
-            path: '/',
-            secure: true,
-        });
         res.status(200).end();
     } else {
         let redirectUri: string | undefined = undefined;
