@@ -4,6 +4,19 @@ const nextConfig = {
     images: {
         domains: ['cdn.goudie.dev'],
     },
+    async headers() {
+        return [
+            {
+                source: '/login',
+                headers: [
+                    {
+                        key: 'access-control-allow-origin',
+                        value: '*',
+                    },
+                ],
+            },
+        ];
+    },
 };
 
 module.exports = nextConfig;
